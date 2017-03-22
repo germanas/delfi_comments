@@ -68,4 +68,5 @@ data_frame = pd.DataFrame(
     {'string':text_list}
 )
 print data_frame
-data_frame.to_csv('delfiOutput.csv', sep='\t')
+
+data_frame.to_csv('delfiOutput.csv', mode='a', sep='\t')

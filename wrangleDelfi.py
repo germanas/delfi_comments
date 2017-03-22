@@ -21,7 +21,7 @@ def find_country_from_ip(ip):
         return match.country
 
 
-
+#drop dublicates
 
 
 def shape_data(data_frame, shaped_dataframe, find_country_from_ip):
@@ -53,9 +53,11 @@ def shape_data(data_frame, shaped_dataframe, find_country_from_ip):
 
 good_data_set = shape_data(data_frame, new_data_frame(data_frame),  find_country_from_ip)
 
+
+
 print sum(pd.isnull(good_data_set['ip address']))
 print good_data_set
-good_data_set.to_csv('delfiout.csv', sep='\t', encoding='utf-8')
+good_data_set.to_csv('delfiout.csv', sep='\t', encoding='utf-8', mode='a')
 
 #good_data_set['country']
 
