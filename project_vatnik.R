@@ -1,5 +1,5 @@
 library(readr)
-delfi_data <- read_delim("~/RSTUDIO/delfiout.csv", 
+delfi_data <- read_delim("delfiout.csv", 
                        "\t", trim_ws = TRUE)
 
 # Load
@@ -27,7 +27,7 @@ wordcloud(words = subset_of_text$text, min.freq = 50,
 
 library(ggplot2)
 
-ggplot(aes(x = time), data = delfi_data) +
+ggplot(aes(x = thumbs_up), data = delfi_data) +
   geom_histogram()
 
 ggplot(aes(x = time, y = word_count), data = subset(delfi_data, !is.na(time))) +
