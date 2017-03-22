@@ -1,8 +1,6 @@
 from bs4 import BeautifulSoup
 import pprint
 import pandas as pd
-import re
-import numpy as np
 
 import requests
 
