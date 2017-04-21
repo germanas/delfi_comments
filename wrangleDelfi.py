@@ -20,11 +20,21 @@ def find_country_from_ip(ip):
     if match is not None:
         return match.country
 
+def find_coord(ip):
+    newip = str(ip)
+    match = geolite2.lookup(newip)
+    if match is not None:
+        return str(match.location)
 
+def find_subdivision(ip):
+    newip = str(ip)
+    match = geolite2.lookup(newip)
+    if match is not None:
+        return match.subdivisions
 #drop dublicates
 
 
-def shape_data(data_frame, shaped_dataframe, find_country_from_ip):
+def shape_data(data_frame, shaped_dataframe, find_country_from_ip, find_coord, find_subdivision):
 
     shaped_dataframe['date'] = data_frame['string'].str.extract('(....-..-.. ..:..)', expand=True)
     shaped_dataframe['ip address'] = data_frame['string'].str.extract('(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', expand=True)
@@ -45,17 +55,30 @@ def shape_data(data_frame, shaped_dataframe, find_country_from_ip):
     shaped_dataframe['thumbs_up'] = shaped_dataframe['thumbs_up'].str.replace('\r\n\t\t\t\t\t\t\t', '')
     shaped_dataframe['country'] = shaped_dataframe['ip address']
     shaped_dataframe['country'] = shaped_dataframe['country'].astype(str)
+    shaped_dataframe['lat'] = shaped_dataframe['ip address']
+    shaped_dataframe['lat'] = shaped_dataframe['lat'].astype(str)
+    shaped_dataframe['lon'] = shaped_dataframe['ip address']
+    shaped_dataframe['lon'] = shaped_dataframe['lon'].astype(str)
+    shaped_dataframe['subdivision'] = shaped_dataframe['ip address']
+    shaped_dataframe['subdivision'] = shaped_dataframe['subdivision'].astype(str)
+
     df_not_missing = shaped_dataframe.dropna()
     df_not_missing['country'] = df_not_missing['country'].apply(find_country_from_ip)
-    #print data_frame['string'].str.contains('(\d{2,3}.\d{3}.\d{3}.\d{3})', regex=True)
 
+    df_not_missing['lat'] = df_not_missing['lat'].apply(find_coord)
+    df_not_missing['lat'], df_not_missing['lon'] = df_not_missing['lat'].str.split(',', 1).str
+    #print data_frame['string'].str.contains('(\d{2,3}.\d{3}.\d{3}.\d{3})', regex=True)
+    df_not_missing['lon'] = df_not_missing['lon'].replace(regex=True,to_replace=r'\)',value=r'')
+    df_not_missing['lat'] = df_not_missing['lat'].replace(regex=True,to_replace=r'\(',value=r'')
+
+    df_not_missing['subdivision'] = df_not_missing['subdivision'].apply(find_subdivision)
     return df_not_missing
 
-good_data_set = shape_data(data_frame, new_data_frame(data_frame),  find_country_from_ip)
+good_data_set = shape_data(data_frame, new_data_frame(data_frame),  find_country_from_ip, find_coord, find_subdivision)
 
 
 
-print sum(pd.isnull(good_data_set['ip address']))
+#print sum(pd.isnull(good_data_set['ip address']))
 print good_data_set
 good_data_set.to_csv('delfiout.csv', sep='\t', encoding='utf-8', mode='a')
 
