@@ -20,4 +20,18 @@ ggplot(data=normalised, aes(x=time, y=total_score, group=country, colour=country
   geom_smooth() +
   stat_smooth()
 
-write.csv(my_data, file = "clean_data.csv")
+library(lubridate)
+without_na <- subset(normalised, select=c("time", "total_score", "country"))
+without_na$time <- hour(without_na$time)
+
+library(dplyr)
+grouped_data <- without_na%>%
+  group_by(time, country)%>%
+  summarise(total_score_means=mean(total_score))
+
+grouped_data$country[grouped_data$country == "LT"] <- "Lithuania"
+grouped_data$country[grouped_data$country == "GB"] <- "Great Britain"
+grouped_data$country[grouped_data$country == "IE"] <- "Ireland"
+grouped_data$country[grouped_data$country == "NO"] <- "Norway"
+grouped_data$country[grouped_data$country == "SE"] <- "Sweden"
+write.csv(grouped_data, file = "clean_data.csv")
